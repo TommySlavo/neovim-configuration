@@ -5,6 +5,7 @@ return {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     "nvim-tree/nvim-web-devicons",
+    "folke/todo-comments.nvim",
   },
   config = function()
     local telescope = require("telescope")
@@ -27,6 +28,7 @@ return {
     })
 
     telescope.load_extension("fzf")
+    require("telescope").load_extension("noice")
 
     -- set keymaps
     local keymap = vim.keymap -- for conciseness
