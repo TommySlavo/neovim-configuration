@@ -24,3 +24,5 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 keymap.set("n", "<leader>b", ":buffers<CR>:buffer<space>", { desc = "List and switch buffers", silent = false }) -- list and switch buffers
 
 keymap.set("n", "<Tab>", "4l", { silent = true })                                                                -- tab in normal mode
+
+keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
