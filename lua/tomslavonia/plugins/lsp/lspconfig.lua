@@ -3,7 +3,9 @@ return {
   dependencies = {
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
+    "hrsh7th/nvim-cmp",
     "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
     "hrsh7th/cmp-cmdline",
@@ -14,7 +16,8 @@ return {
   config = function()
     -- import cmp-nvim-lsp plugin
     local cmp_lsp = require("cmp_nvim_lsp")
-    local capabilities = cmp_lsp.default_capabilities()
+
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
 
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
@@ -25,6 +28,14 @@ return {
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
     vim.diagnostic.config({
+      virtual_lines = true,
+      virtual_text = true,
+      underline = true,
+      severity_sort = true,
+      float = {
+        border = "rounded",
+        source = true,
+      },
       signs = {
         text = {
           [vim.diagnostic.severity.ERROR] = signs.Error,
@@ -41,27 +52,20 @@ return {
       },
     })
 
+    vim.lsp.config("*", {
+      capabilities = {
+        textDocument = {
+          semanticTokens = {
+            multilineTokenSupport = true,
+          },
+        },
+      },
+    })
+
     for type, icon in pairs(signs) do
       local hl = "DiagnosticSign" .. type
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
     end
-
-    require("lspconfig").clangd.setup({
-      cmd = {
-        "clangd",
-        "--query-driver=/usr/bin/clang++,/usr/bin/clang",
-        "--compile-commands-dir=.",
-        "--background-index",
-        "--clang-tidy",
-        "--completion-style=detailed",
-        "--header-insertion=iwyu",
-      },
-      init_options = {
-        compilationDatabasePath = ".",
-        usePlaceholders = true,
-        completeUnimported = true,
-      },
-    })
 
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
@@ -114,11 +118,15 @@ return {
           vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
         end
 
-        if client:supports_method("textDocument/formatting") then
+        if
+            not client:supports_method("textDocument/willSaveWaitUntil")
+            and client:supports_method("textDocument/formatting")
+        then
           vim.api.nvim_create_autocmd("BufWritePre", {
+            group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = false }),
             buffer = event.buf,
             callback = function()
-              vim.lsp.buf.format({ bufnr = event.buf, id = client.id })
+              vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 3000 })
             end,
           })
         end
