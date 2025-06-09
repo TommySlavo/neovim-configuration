@@ -12,6 +12,17 @@ return {
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "j-hui/fidget.nvim",
+    {
+      "folke/lazydev.nvim",
+      ft = "lua", -- only load on lua files
+      opts = {
+        library = {
+          -- See the configuration section for more details
+          -- Load luvit types when the `vim.uv` word is found
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        },
+      },
+    },
   },
   config = function()
     -- import cmp-nvim-lsp plugin
@@ -24,6 +35,8 @@ return {
 
     -- import mason-lspconfig plugin
     local mason_lspconfig = require("mason-lspconfig")
+
+    vim.lsp.enable("basedpyright")
 
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
@@ -101,10 +114,14 @@ return {
         keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
 
         opts.desc = "Go to previous diagnostic"
-        keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+        keymap.set("n", "[d", function()
+          vim.diagnostic.jump({ count = -1 })
+        end, opts)
 
         opts.desc = "Go to next diagnostic"
-        keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+        keymap.set("n", "]d", function()
+          vim.diagnostic.jump({ count = 1 })
+        end, opts)
 
         opts.desc = "Show documentation for what is under cursor"
         keymap.set("n", "K", vim.lsp.buf.hover, opts)
@@ -114,44 +131,46 @@ return {
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-        if client:supports_method("textDocument/completion") then
-          vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
-        end
+        if client ~= nil then
+          if client:supports_method("textDocument/completion") then
+            vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
+          end
 
-        if
-            not client:supports_method("textDocument/willSaveWaitUntil")
-            and client:supports_method("textDocument/formatting")
-        then
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = false }),
-            buffer = event.buf,
-            callback = function()
-              vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 3000 })
-            end,
-          })
-        end
+          if
+              not client:supports_method("textDocument/willSaveWaitUntil")
+              and client:supports_method("textDocument/formatting")
+          then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = false }),
+              buffer = event.buf,
+              callback = function()
+                vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 3000 })
+              end,
+            })
+          end
 
-        if client:supports_method("textDocument/inlayHint") then
-          vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
-        end
+          if client:supports_method("textDocument/inlayHint") then
+            vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+          end
 
-        if client:supports_method("textDocument/documentHighlight") then
-          local autocmd = vim.api.nvim_create_autocmd
-          local augroup = vim.api.nvim_create_augroup("lsp_highlight", { clear = false })
+          if client:supports_method("textDocument/documentHighlight") then
+            local autocmd = vim.api.nvim_create_autocmd
+            local augroup = vim.api.nvim_create_augroup("lsp_highlight", { clear = false })
 
-          vim.api.nvim_clear_autocmds({ buffer = event.buf, group = augroup })
+            vim.api.nvim_clear_autocmds({ buffer = event.buf, group = augroup })
 
-          autocmd({ "CursorHold" }, {
-            group = augroup,
-            buffer = event.buf,
-            callback = vim.lsp.buf.document_highlight,
-          })
+            autocmd({ "CursorHold" }, {
+              group = augroup,
+              buffer = event.buf,
+              callback = vim.lsp.buf.document_highlight,
+            })
 
-          autocmd({ "CursorMoved" }, {
-            group = augroup,
-            buffer = event.buf,
-            callback = vim.lsp.buf.clear_references,
-          })
+            autocmd({ "CursorMoved" }, {
+              group = augroup,
+              buffer = event.buf,
+              callback = vim.lsp.buf.clear_references,
+            })
+          end
         end
 
         vim.opt.completeopt = { "menu", "menuone", "noselect", "noinsert" }
