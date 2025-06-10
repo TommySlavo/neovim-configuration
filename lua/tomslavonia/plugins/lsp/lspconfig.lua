@@ -38,6 +38,24 @@ return {
 
     vim.lsp.enable("basedpyright")
 
+    vim.lsp.enable("clangd")
+
+    vim.lsp.enable("gopls")
+
+    vim.lsp.enable("bash-language-server")
+
+    vim.lsp.enable("texlab")
+
+    vim.lsp.enable("sqlls")
+
+    vim.lsp.enable("graphql")
+
+    vim.lsp.enable("emmet_ls")
+
+    vim.lsp.enable("dockerls")
+
+    vim.lsp.enable("bashls")
+
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
     vim.diagnostic.config({
