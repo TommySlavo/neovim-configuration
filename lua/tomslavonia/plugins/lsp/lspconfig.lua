@@ -46,7 +46,7 @@ return {
 
     vim.lsp.enable("texlab")
 
-    vim.lsp.enable("sqlls")
+    vim.lsp.enable("sqls")
 
     vim.lsp.enable("graphql")
 
