@@ -79,7 +79,7 @@ return {
       capabilities = capabilities,
     })
 
-    cmp.setup.filtype({ "sql" }, {
+    cmp.setup.filetype({ "sql" }, {
       sources = {
         { name = "vim-dadbod-completion" },
         { name = "buffer" },
