@@ -78,5 +78,12 @@ return {
     require("lspconfig")["clangd"].setup({
       capabilities = capabilities,
     })
+
+    cmp.setup.filtype({ "sql" }, {
+      sources = {
+        { name = "vim-dadbod-completion" },
+        { name = "buffer" },
+      },
+    })
   end,
 }
