@@ -56,6 +56,8 @@ return {
 
     vim.lsp.enable("bashls")
 
+    vim.lsp.enable("tsserver")
+
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
     vim.diagnostic.config({
