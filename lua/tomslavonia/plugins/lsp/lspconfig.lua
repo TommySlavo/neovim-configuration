@@ -36,8 +36,6 @@ return {
     -- import mason-lspconfig plugin
     local mason_lspconfig = require("mason-lspconfig")
 
-    vim.lsp.enable("basedpyright")
-
     vim.lsp.enable("clangd")
 
     vim.lsp.enable("gopls")
@@ -57,6 +55,22 @@ return {
     vim.lsp.enable("bashls")
 
     vim.lsp.enable("tsserver")
+
+    require("lspconfig").basedpyright.setup({
+      settings = {
+        python = {
+          analysis = {
+            typeCheckingMode = "basic",     -- keep real errors, lighter type checking
+            diagnosticSeverityOverrides = {
+              reportMissingTypeStubs = "none", -- silence missing stub warnings
+              reportUnknownParameterType = "none", -- silence unknown parameter type
+              reportUnknownVariableType = "none", -- silence unknown variable type
+              reportMissingParameterType = "none", -- silence missing parameter type
+            },
+          },
+        },
+      },
+    })
 
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
@@ -234,21 +248,6 @@ return {
         vim.keymap.set("i", "<Tab>", tab_complete, { expr = true })
         vim.keymap.set("i", "<S-Tab>", tab_prev, { expr = true })
       end,
-    })
-    require("lspconfig").basedpyright.setup({
-      settings = {
-        python = {
-          analysis = {
-            typeCheckingMode = "basic",     -- keep real errors, lighter type checking
-            diagnosticSeverityOverrides = {
-              reportMissingTypeStubs = "none", -- silence missing stub warnings
-              reportUnknownParameterType = "none", -- silence unknown parameter type
-              reportUnknownVariableType = "none", -- silence unknown variable type
-              reportMissingParameterType = "none", -- silence missing parameter type
-            },
-          },
-        },
-      },
     })
   end,
 }
