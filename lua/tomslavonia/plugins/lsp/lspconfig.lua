@@ -36,18 +36,6 @@ return {
     -- import mason-lspconfig plugin
     local mason_lspconfig = require("mason-lspconfig")
 
-    lspconfig.basedpyright.setup({
-      settings = {
-        python = {
-          analysis = {
-            typeCheckingMode = "off", -- or "off"
-            reportUnusedCallResult = "none",
-            reportUnknownMemberType = "none",
-          },
-        },
-      },
-    })
-
     vim.lsp.enable("basedpyright")
 
     vim.lsp.enable("clangd")
@@ -246,6 +234,21 @@ return {
         vim.keymap.set("i", "<Tab>", tab_complete, { expr = true })
         vim.keymap.set("i", "<S-Tab>", tab_prev, { expr = true })
       end,
+      require("lspconfig").pyright.setup({
+        settings = {
+          python = {
+            analysis = {
+              typeCheckingMode = "basic",    -- keep real errors, lighter type checking
+              diagnosticSeverityOverrides = {
+                reportMissingTypeStubs = "none", -- silence missing stub warnings
+                reportUnknownParameterType = "none", -- silence unknown parameter type
+                reportUnknownVariableType = "none", -- silence unknown variable type
+                reportMissingParameterType = "none", -- silence missing parameter type
+              },
+            },
+          },
+        },
+      }),
     })
   end,
 }
