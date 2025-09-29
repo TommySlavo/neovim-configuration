@@ -56,21 +56,26 @@ return {
 
     vim.lsp.enable("tsserver")
 
-    require("lspconfig").basedpyright.setup({
+    vim.lsp.config("basedpyright", {
       settings = {
-        python = {
+        basedpyright = {
           analysis = {
-            typeCheckingMode = "basic",     -- keep real errors, lighter type checking
+            typeCheckingMode = "basic", -- keep only real errors
+            diagnosticMode = "openFilesOnly",
             diagnosticSeverityOverrides = {
-              reportMissingTypeStubs = "none", -- silence missing stub warnings
-              reportUnknownParameterType = "none", -- silence unknown parameter type
-              reportUnknownVariableType = "none", -- silence unknown variable type
-              reportMissingParameterType = "none", -- silence missing parameter type
+              reportMissingTypeStubs = "off",
+              reportUnknownParameterType = "off",
+              reportUnknownVariableType = "off",
+              reportMissingParameterType = "off",
+              reportUnknownMemberType = "off",
+              reportUnknownArgumentType = "off",
             },
           },
         },
       },
     })
+
+    vim.lsp.enable("basedpyright")
 
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
