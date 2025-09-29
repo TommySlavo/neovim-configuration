@@ -1,4 +1,5 @@
 return {
+  "hrsh7th/nvim-cmp",
   enabled = true,
   config = function()
     local cmp = require("cmp")
@@ -63,7 +64,7 @@ return {
         { name = "buffer" },
       }),
     })
-    require("cmp_git").setup()
+    require("cmp_git").setup({})
 
     cmp.setup.cmdline({ "/", "?" }, {
       mapping = cmp.mapping.preset.cmdline(),
@@ -76,6 +77,13 @@ return {
 
     require("lspconfig")["clangd"].setup({
       capabilities = capabilities,
+    })
+
+    cmp.setup.filetype({ "sql" }, {
+      sources = {
+        { name = "vim-dadbod-completion" },
+        { name = "buffer" },
+      },
     })
   end,
 }

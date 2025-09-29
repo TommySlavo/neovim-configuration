@@ -26,3 +26,5 @@ keymap.set("n", "<leader>b", ":buffers<CR>:buffer<space>", { desc = "List and sw
 keymap.set("n", "<Tab>", "4l", { silent = true })                                                                -- tab in normal mode
 
 keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
+
+keymap.set("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Escape terminal" })
