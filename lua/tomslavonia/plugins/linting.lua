@@ -4,13 +4,6 @@ return {
   config = function()
     local lint = require("lint")
 
-    -- Configure pylint to be less noisy
-    lint.linters.pylint.args = {
-      "--errors-only",       -- Only show errors, not warnings/conventions
-      "--disable=import-error", -- Often gives false positives
-      "--output-format=json",
-    }
-
     lint.linters_by_ft = {
       javascript = { "eslint_d" },
       typescript = { "eslint_d" },

@@ -36,6 +36,18 @@ return {
     -- import mason-lspconfig plugin
     local mason_lspconfig = require("mason-lspconfig")
 
+    lspconfig.basedpyright.setup({
+      settings = {
+        python = {
+          analysis = {
+            typeCheckingMode = "off", -- or "off"
+            reportUnusedCallResult = "none",
+            reportUnknownMemberType = "none",
+          },
+        },
+      },
+    })
+
     vim.lsp.enable("basedpyright")
 
     vim.lsp.enable("clangd")
