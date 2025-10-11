@@ -56,7 +56,7 @@ return {
 
     vim.lsp.enable("tsserver")
 
-    vim.lsp.enable("arduino_language_server")
+    vim.lsp.enable("arduino-language-server")
 
     vim.lsp.config("basedpyright", {
       settings = {
