@@ -56,6 +56,8 @@ return {
 
     vim.lsp.enable("tsserver")
 
+    vim.lsp.enable("arduino_language_server")
+
     vim.lsp.config("basedpyright", {
       settings = {
         basedpyright = {
@@ -70,6 +72,9 @@ return {
               reportUnknownMemberType = "off",
               reportUnknownArgumentType = "off",
             },
+          },
+          python = {
+            pythonPath = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
           },
         },
       },
