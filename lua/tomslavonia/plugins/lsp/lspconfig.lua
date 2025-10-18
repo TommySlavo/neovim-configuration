@@ -56,18 +56,18 @@ return {
 
     vim.lsp.enable("tsserver")
 
-    vim.lsp.config("arduino_language_server", {
+    lspconfig.arduino_language_server.setup({
       cmd = {
-        vim.fn.stdpath("data") .. "/mason/bin/arduino-language-server",
-        "-cli-config",
-        vim.fn.expand("~/.arduino15/arduino-cli.yaml"),
+        "arduino-language-server",
         "-clangd",
-        vim.fn.stdpath("data") .. "/mason/bin/clangd",
+        "C:/msys64/mingw64/bin/clangd.exe",
         "-cli",
-        "arduino-cli", -- This usually needs to be installed separately
+        "C:/Program Files/Arduino CLI/arduino-cli.exe",
+        "-cli-config",
+        "C:/Users/tomslavonia/AppData/Local/Arduino15/arduino-cli.yaml",
+        "-fqbn",
+        "arduino:esp32:nano_nora",
       },
-      filetypes = { "arduino" },
-      root_dir = vim.fs.root(0, { "*.ino", ".git" }),
     })
 
     vim.lsp.enable("arduino_language_server")
