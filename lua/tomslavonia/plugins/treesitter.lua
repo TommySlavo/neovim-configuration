@@ -19,6 +19,7 @@ return {
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false, -- improve performance
+        disable = { "latex" },
       },
       indent = { enable = true },
       autotag = { enable = true },

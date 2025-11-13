@@ -42,6 +42,8 @@ return {
 
     vim.lsp.enable("bash-language-server")
 
+    vim.lsp.enable("matlab_ls")
+
     vim.lsp.enable("texlab")
 
     vim.lsp.enable("sqls")
