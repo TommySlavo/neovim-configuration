@@ -8,12 +8,13 @@ return {
 
   config = function()
     local luasnip = require("luasnip")
-    require("luasnip.loaders.from_vscode").lazy_load()
+    require("luasnip.loaders.from_lua").lazy_load()
 
     require("luasnip").config.set_config({
       history = true,
       updateevents = "TextChanged,TextChangedI",
       enable_autosnippets = true,
+      store_selection_keys = "<Tab>",
     })
   end,
 }
