@@ -1,1 +1,1 @@
-Hello my name is tom
+My Neovim text editor.
