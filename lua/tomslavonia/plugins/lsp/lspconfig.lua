@@ -25,17 +25,6 @@ return {
     },
   },
   config = function()
-    -- import cmp-nvim-lsp plugin
-    local cmp_lsp = require("cmp_nvim_lsp")
-
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-
-    -- import lspconfig plugin
-    local lspconfig = require("lspconfig")
-
-    -- import mason-lspconfig plugin
-    local mason_lspconfig = require("mason-lspconfig")
-
     vim.lsp.enable("clangd")
 
     vim.lsp.enable("gopls")
@@ -76,7 +65,7 @@ return {
             },
           },
           python = {
-            pythonPath = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
+            pythonPath = "/usr/local/bin/python3",
           },
         },
       },
