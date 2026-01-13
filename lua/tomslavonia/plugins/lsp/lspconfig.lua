@@ -49,28 +49,13 @@ return {
 
     vim.lsp.enable("arduino_language_server")
 
-    python_path = function(config, root_dir)
-      local path = root_dir .. "/.venv/lib"
-      local handle = vim.fn.glob(site .. "python*/site-packages", 1, 1)[1]
-      if handle then
-        config.settings.python.analysis.extraPaths = { handle }
-      end
-    end
-
     vim.lsp.config("basedpyright", {
-      on_new_config = function(config, root_dir)
-        -- 1. Prefer project-local .venv if it exists
-        local venv_python = root_dir .. "/.venv/bin/python3"
-        if vim.fn.executable(venv_python) == 1 then
-          config.settings.python.pythonPath = venv_python
-        end
-
-        -- 2. Dynamically discover site-packages
-        local site = vim.fn.glob(root_dir .. "/.venv/lib/python*/site-packages", true, true)[1]
-
-        if site then
-          config.settings.python.analysis = config.settings.python.analysis or {}
-          config.settings.python.analysis.extraPaths = { site }
+      new_config = function(config, root_dir)
+        if vim.fn.isdirectory(root_dir .. "/.venv") == 1 then
+          config.settings.basedpyright = config.settings.basedpyright or {}
+          config.settings.basedpyright.analysis = config.settings.basedpyright.analysis or {}
+          config.settings.basedpyright.analysis.venvPath = root_dir
+          config.settings.basedpyright.analysis.venv = ".venv"
         end
       end,
       settings = {
