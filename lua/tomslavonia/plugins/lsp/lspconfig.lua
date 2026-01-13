@@ -53,9 +53,6 @@ return {
       settings = {
         basedpyright = {
           analysis = {
-            autoSearchPaths = true,
-            venvPath = ".",
-            venv = ".venv",
             typeCheckingMode = "basic", -- keep only real errors
             diagnosticMode = "openFilesOnly",
             diagnosticSeverityOverrides = { -- prevents unnecessary warnings
