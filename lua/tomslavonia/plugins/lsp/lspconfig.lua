@@ -50,20 +50,12 @@ return {
     vim.lsp.enable("arduino_language_server")
 
     vim.lsp.config("basedpyright", {
-      new_config = function(config, root_dir)
-        if vim.fn.isdirectory(root_dir .. "/.venv") == 1 then
-          config.settings.basedpyright = config.settings.basedpyright or {}
-          config.settings.basedpyright.analysis = config.settings.basedpyright.analysis or {}
-          config.settings.basedpyright.analysis.venvPath = root_dir
-          config.settings.basedpyright.analysis.venv = ".venv"
-        end
-      end,
       settings = {
-        python = {
-          pythonPath = vim.fn.getcwd() .. "/.venv/bin/python3",
-        },
         basedpyright = {
           analysis = {
+            autoSearchPaths = true,
+            venvPath = ".",
+            venv = ".venv",
             typeCheckingMode = "basic", -- keep only real errors
             diagnosticMode = "openFilesOnly",
             diagnosticSeverityOverrides = { -- prevents unnecessary warnings
