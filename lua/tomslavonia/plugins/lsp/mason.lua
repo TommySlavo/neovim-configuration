@@ -42,7 +42,10 @@ return {
       },
     })
 
-    require("mason-nvim-dap").setup()
+    require("mason-nvim-dap").setup({
+      automatic_installation = true,
+      ensure_installed = { "cpptools", "local-lua-debugger-vscode" },
+    })
 
     -- update lsps
     require("mason-update-all").setup()

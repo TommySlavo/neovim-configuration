@@ -15,60 +15,63 @@ return {
     config = function()
       local dap = require("dap")
       local ui = require("dapui")
+      local data_path = vim.fn.stdpath("data")
 
       require("dapui").setup()
 
-      dap.adapters.cppdbg = {
-        id = "cppdbg",
-        type = "executable",
-        command = "/absolute/path/to/cpptools/extension/debugAdapters/bin/OpenDebugAD7",
-      }
+      local cpptools_open_debug = data_path .. "/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7"
+      if vim.fn.executable(cpptools_open_debug) == 1 then
+        dap.adapters.cppdbg = {
+          id = "cppdbg",
+          type = "executable",
+          command = cpptools_open_debug,
+        }
 
-      dap.configurations.cpp = {
-        {
-          name = "Launch file",
-          type = "cppdbg",
-          request = "launch",
-          program = function()
-            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+        dap.configurations.cpp = {
+          {
+            name = "Launch file",
+            type = "cppdbg",
+            request = "launch",
+            program = function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+            end,
+            cwd = "${workspaceFolder}",
+            stopAtEntry = true,
+          },
+          {
+            name = "Attach to gdbserver :1234",
+            type = "cppdbg",
+            request = "launch",
+            MIMode = "gdb",
+            miDebuggerServerAddress = "localhost:1234",
+            miDebuggerPath = "/usr/bin/gdb",
+            cwd = "${workspaceFolder}",
+            program = function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+            end,
+          },
+        }
+        dap.configurations.c = dap.configurations.cpp
+      end
+
+      local lua_debug_extension = data_path .. "/mason/packages/local-lua-debugger-vscode/extension/"
+      local lua_debug_adapter = lua_debug_extension .. "extension/debugAdapter.js"
+      if vim.fn.executable("node") == 1 and vim.fn.filereadable(lua_debug_adapter) == 1 then
+        dap.adapters["local-lua"] = {
+          type = "executable",
+          command = "node",
+          args = { lua_debug_adapter },
+          enrich_config = function(config, on_config)
+            if not config.extensionPath then
+              local c = vim.deepcopy(config)
+              c.extensionPath = lua_debug_extension
+              on_config(c)
+            else
+              on_config(config)
+            end
           end,
-          cwd = "${workspaceFolder}",
-          stopAtEntry = true,
-        },
-        {
-          name = "Attach to gdbserver :1234",
-          type = "cppdbg",
-          request = "launch",
-          MIMode = "gdb",
-          miDebuggerServerAddress = "localhost:1234",
-          miDebuggerPath = "/usr/bin/gdb",
-          cwd = "${workspaceFolder}",
-          program = function()
-            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-          end,
-        },
-      }
-
-      dap.configurations.c = dap.configurations.cpp
-
-      dap.adapters["local-lua"] = {
-        type = "executable",
-        command = "local-lua-debugger-vscode",
-        args = {
-          "/absolute/path/to/local-lua-debugger-vscode/extension/debugAdapter.js",
-        },
-        enrich_config = function(config, on_config)
-          if not config["extensionPath"] then
-            local c = vim.deepcopy(config)
-            -- 💀 If this is missing or wrong you'll see
-            -- "module 'lldebugger' not found" errors in the dap-repl when trying to launch a debug session
-            c.extensionPath = "/absolute/path/to/local-lua-debugger-vscode/"
-            on_config(c)
-          else
-            on_config(config)
-          end
-        end,
-      }
+        }
+      end
       vim.keymap.set("n", "<space>b", dap.toggle_breakpoint)
       vim.keymap.set("n", "<space>gb", dap.run_to_cursor)
 

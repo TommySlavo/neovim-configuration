@@ -20,6 +20,9 @@ require("lazy").setup({
 	{ import = "tomslavonia.plugins.lsp" },
 	{ import = "tomslavonia.plugins.lsp.languages" },
 }, { -- import plugins
+	rocks = {
+		enabled = false,
+	},
 	-- automatically check for plugin updates
 	checker = {
 		enabled = true,

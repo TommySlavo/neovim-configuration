@@ -4,7 +4,6 @@ return {
   build = ":TSUpdate",
   dependencies = {
     "windwp/nvim-ts-autotag",
-    "nvim-treesitter/playground",
     "nvim-treesitter/nvim-treesitter-textobjects",
   },
   config = function()
@@ -51,7 +50,7 @@ return {
         "pascal",
         "perl",
         "php",
-        "verilog",
+        "systemverilog",
         "vue",
         "xml",
         "powershell",
