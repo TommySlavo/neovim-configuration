@@ -13,6 +13,8 @@
 - Do not edit `lazy-lock.json` manually; update it only through an intentional Lazy.nvim sync.
 - Preserve existing user changes and do not revert unrelated files.
 - For AI assistance, use Codex for repository-aware work and keep inline completion limited to small local edits.
+- Use named Codex sessions for independent tasks; use separate Git worktrees when those tasks may edit the same files.
+- Use Diffview for side-by-side review of working-tree changes before accepting AI-generated edits.
 
 ## Verification
 

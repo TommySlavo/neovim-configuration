@@ -25,24 +25,30 @@ return {
     })
 
     local Terminal = require("toggleterm.terminal").Terminal
-    local codex = Terminal:new({
-      cmd = codex_command(),
-      direction = "float",
-      close_on_exit = false,
-      hidden = true,
-      float_opts = {
-        border = "curved",
-        width = function()
-          return math.floor(vim.o.columns * 0.9)
+    local function new_codex_terminal(name)
+      return Terminal:new({
+        cmd = codex_command(),
+        direction = "float",
+        close_on_exit = false,
+        display_name = "Codex: " .. name,
+        hidden = true,
+        float_opts = {
+          border = "curved",
+          width = function()
+            return math.floor(vim.o.columns * 0.9)
+          end,
+          height = function()
+            return math.floor(vim.o.lines * 0.9)
+          end,
+        },
+        on_open = function()
+          vim.cmd("startinsert!")
         end,
-        height = function()
-          return math.floor(vim.o.lines * 0.9)
-        end,
-      },
-      on_open = function()
-        vim.cmd("startinsert!")
-      end,
-    })
+      })
+    end
+
+    local codex = new_codex_terminal("primary")
+    local codex_sessions = {}
 
     local function open_codex(prompt)
       codex:open()
@@ -56,6 +62,21 @@ return {
           vim.api.nvim_chan_send(codex.job_id, prompt .. "\n")
         end
       end, 100)
+    end
+
+    local function open_named_codex(name)
+      name = vim.trim(name)
+      if name == "" then
+        return
+      end
+
+      local session = codex_sessions[name]
+      if not session then
+        session = new_codex_terminal(name)
+        codex_sessions[name] = session
+      end
+
+      session:open()
     end
 
     local function current_file()
@@ -98,10 +119,20 @@ return {
       end)
     end, { desc = "Ask Codex about this repository", force = true })
 
+    vim.api.nvim_create_user_command("CodexNew", function(opts)
+      if opts.args ~= "" then
+        open_named_codex(opts.args)
+        return
+      end
+
+      vim.ui.input({ prompt = "New Codex session: " }, open_named_codex)
+    end, { desc = "Open a named Codex session", force = true, nargs = "?" })
+
     vim.api.nvim_create_user_command("CodexReviewFile", review_file, { desc = "Ask Codex to review the current file", force = true })
     vim.api.nvim_create_user_command("CodexReviewSelection", review_selection, { desc = "Ask Codex to review the selection", force = true })
 
     vim.keymap.set("n", "<leader>ac", "<cmd>Codex<cr>", { desc = "Toggle Codex" })
+    vim.keymap.set("n", "<leader>an", "<cmd>CodexNew<cr>", { desc = "New Codex session" })
     vim.keymap.set("n", "<leader>aa", "<cmd>CodexPrompt<cr>", { desc = "Ask Codex" })
     vim.keymap.set("n", "<leader>ar", "<cmd>CodexReviewFile<cr>", { desc = "Review file with Codex" })
     vim.keymap.set("x", "<leader>ar", "<cmd>CodexReviewSelection<cr>", { desc = "Review selection with Codex" })
