@@ -1,5 +1,8 @@
 return {
 	"linux-cultist/venv-selector.nvim",
+	enabled = function()
+		return vim.fn.executable("fd") == 1 or vim.fn.executable("fdfind") == 1
+	end,
 	dependencies = {
 		"neovim/nvim-lspconfig",
 		"mfussenegger/nvim-dap",
@@ -10,8 +13,13 @@ return {
 	keys = {
 		{ "<leader>ve", "<cmd>VenvSelect<cr>", desc = "venv environment" }, -- Open picker on keymap
 	},
-	opts = { -- this can be an empty lua table - just showing below for clarity.
-		search = {}, -- if you add your own searches, they go here.
-		options = {}, -- if you add plugin options, they go here.
-	},
+	opts = function()
+		local fd_name = vim.fn.executable("fd") == 1 and "fd" or "fdfind"
+		return {
+			search = {},
+			options = {
+				fd_binary_name = fd_name,
+			},
+		}
+	end,
 }

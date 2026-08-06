@@ -10,11 +10,38 @@ return {
   config = function()
     local telescope = require("telescope")
     local actions = require("telescope.actions")
+    local function resolve_rg()
+      local candidates = {
+        vim.fn.exepath("rg"),
+        "/Applications/Codex.app/Contents/Resources/rg",
+        "/opt/homebrew/bin/rg",
+        "/usr/local/bin/rg",
+      }
+
+      for _, candidate in ipairs(candidates) do
+        if candidate ~= "" and vim.fn.executable(candidate) == 1 then
+          return candidate
+        end
+      end
+
+      return "rg"
+    end
+    local rg = resolve_rg()
 
     telescope.setup({
       defaults = {
+        vimgrep_arguments = {
+          rg,
+          "--color=never",
+          "--no-heading",
+          "--with-filename",
+          "--line-number",
+          "--column",
+          "--smart-case",
+        },
         preview = {
           preview_cut = 1,
+          treesitter = false,
         },
         path_display = { "smart" },
         mappings = {

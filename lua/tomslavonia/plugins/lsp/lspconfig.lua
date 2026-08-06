@@ -49,10 +49,124 @@ return {
 
     vim.lsp.enable("arduino_language_server")
 
+    local function get_python_path(root_dir)
+      local candidates = {
+        root_dir and (root_dir .. "/.venv/bin/python"),
+        root_dir and (root_dir .. "/venv/bin/python"),
+        vim.env.VIRTUAL_ENV and (vim.env.VIRTUAL_ENV .. "/bin/python"),
+        vim.fn.exepath("python3"),
+        vim.fn.exepath("python"),
+      }
+
+      for _, python in ipairs(candidates) do
+        if python and python ~= "" and vim.fn.executable(python) == 1 then
+          return python
+        end
+      end
+
+      return "python"
+    end
+
+    local function set_basedpyright_python_path(client)
+      local python_path = get_python_path(client.root_dir or vim.fn.getcwd())
+      client.settings = client.settings or {}
+      client.settings.python = vim.tbl_deep_extend("force", client.settings.python or {}, {
+        pythonPath = python_path,
+      })
+      client:notify("workspace/didChangeConfiguration", { settings = nil })
+    end
+
+    if vim.fn.exists(":LspInfo") == 0 then
+      vim.api.nvim_create_user_command("LspInfo", "checkhealth vim.lsp", {
+        desc = "Alias to :checkhealth vim.lsp",
+      })
+    end
+
+    if vim.fn.exists(":LspLog") == 0 then
+      vim.api.nvim_create_user_command("LspLog", function()
+        vim.cmd(string.format("tabnew %s", vim.lsp.log.get_filename()))
+      end, {
+        desc = "Open the Nvim LSP client log",
+      })
+    end
+
+    if vim.fn.exists(":LspStart") == 0 then
+      vim.api.nvim_create_user_command("LspStart", function(info)
+        local args = info.args ~= "" and (" " .. info.args) or ""
+        vim.cmd("lsp enable" .. args)
+      end, {
+        desc = "Alias to :lsp enable",
+        nargs = "?",
+        complete = function(arg)
+          return vim
+            .iter(vim.api.nvim_get_runtime_file(("lsp/%s*.lua"):format(arg), true))
+            :map(function(path)
+              local file_name = path:match("[^/]*.lua$")
+              return file_name and file_name:sub(1, #file_name - 4)
+            end)
+            :filter(function(name)
+              return name ~= nil
+            end)
+            :totable()
+        end,
+      })
+    end
+
+    if vim.fn.exists(":LspRestart") == 0 then
+      vim.api.nvim_create_user_command("LspRestart", function(info)
+        local args = info.args ~= "" and (" " .. info.args) or ""
+        vim.cmd("lsp restart" .. args)
+      end, {
+        desc = "Alias to :lsp restart",
+        nargs = "?",
+        complete = function(arg)
+          return vim
+            .iter(vim.lsp.get_clients())
+            :map(function(client)
+              return client.name
+            end)
+            :filter(function(name)
+              return name:sub(1, #arg) == arg
+            end)
+            :totable()
+        end,
+      })
+    end
+
+    if vim.fn.exists(":LspStop") == 0 then
+      vim.api.nvim_create_user_command("LspStop", function(info)
+        local args = info.args ~= "" and (" " .. info.args) or ""
+        vim.cmd("lsp stop" .. args)
+      end, {
+        desc = "Alias to :lsp stop",
+        nargs = "?",
+        complete = function(arg)
+          return vim
+            .iter(vim.lsp.get_clients())
+            :map(function(client)
+              return client.name
+            end)
+            :filter(function(name)
+              return name:sub(1, #arg) == arg
+            end)
+            :totable()
+        end,
+      })
+    end
+
     vim.lsp.config("basedpyright", {
+      before_init = function(_, config)
+        config.settings = config.settings or {}
+        config.settings.python = config.settings.python or {}
+        config.settings.python.pythonPath = get_python_path(config.root_dir or vim.fn.getcwd())
+      end,
+      on_init = function(client)
+        set_basedpyright_python_path(client)
+      end,
       settings = {
         basedpyright = {
           analysis = {
+            autoImportCompletions = true,
             typeCheckingMode = "basic", -- keep only real errors
             diagnosticMode = "openFilesOnly",
             diagnosticSeverityOverrides = { -- prevents unnecessary warnings
@@ -164,6 +278,15 @@ return {
         local client = vim.lsp.get_client_by_id(event.data.client_id)
 
         if client ~= nil then
+          if client.name == "basedpyright" then
+            vim.api.nvim_buf_create_user_command(event.buf, "LspPyrightPythonPath", function()
+              local python_path = vim.tbl_get(client.settings or {}, "python", "pythonPath") or "unset"
+              vim.notify(python_path, vim.log.levels.INFO, { title = "basedpyright pythonPath" })
+            end, {
+              desc = "Show basedpyright Python interpreter",
+            })
+          end
+
           if client:supports_method("textDocument/completion") then
             vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
           end

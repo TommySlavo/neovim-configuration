@@ -2,6 +2,12 @@ vim.cmd("let g:netrw_liststyle = 3")
 
 local opt = vim.opt
 
+-- Ensure Mason bin is on PATH for formatters/linters.
+local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+if not vim.env.PATH:find(mason_bin, 1, true) then
+  vim.env.PATH = mason_bin .. ":" .. vim.env.PATH
+end
+
 opt.relativenumber = true
 opt.number = true
 
